@@ -1,0 +1,12 @@
+[package]
+name = "Sim-X"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.90"
+
+[dependencies]
+env_logger = "0.11.11"
+pollster = "1.0.1"
+rodio = "0.22.2"
+sim-engine = "0.1.0"
+winit = "0.30.12"
