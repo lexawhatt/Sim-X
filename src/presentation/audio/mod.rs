@@ -2,7 +2,7 @@ use std::io::Cursor;
 
 use rodio::{Decoder, DeviceSinkBuilder, MixerDeviceSink, Player};
 
-const TIME_GATE_TRACK: &[u8] = include_bytes!("../../../Hacking to the Gate.mp3");
+const TIME_GATE_TRACK: &[u8] = include_bytes!("../../../assets/audio/hacking_to_the_gate.mp3");
 const BACKGROUND_VOLUME: f32 = 0.12;
 
 pub(crate) struct EasterEggAudio {

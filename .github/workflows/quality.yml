@@ -1,0 +1,38 @@
+name: quality
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  rust:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install desktop build dependencies
+        run: sudo apt-get update && sudo apt-get install --yes libasound2-dev
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy,rustfmt
+      - uses: Swatinem/rust-cache@v2
+      - name: Install module graph checker
+        run: cargo install cargo-modules --version 0.27.0 --locked
+      - name: Format
+        run: cargo fmt --all -- --check
+      - name: Headless tests
+        run: cargo test --lib --no-default-features
+      - name: Complete tests
+        run: cargo test --all-targets --all-features
+      - name: Headless Clippy
+        run: cargo clippy --lib --no-default-features -- -D warnings
+      - name: Complete Clippy
+        run: cargo clippy --all-targets --all-features -- -D warnings
+      - name: Documentation
+        run: RUSTDOCFLAGS="-D warnings -D missing-docs" cargo doc --no-deps --all-features
+      - name: Architecture dependency graph
+        run: bash tools/check_module_boundaries.sh
+      - uses: dtolnay/rust-toolchain@1.90.0
+      - name: Declared Rust 1.90 compatibility
+        run: |
+          cargo check --all-targets --no-default-features
+          cargo check --all-targets --all-features

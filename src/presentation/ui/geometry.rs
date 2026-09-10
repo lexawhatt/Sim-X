@@ -56,18 +56,4 @@ impl UiRect {
             max: Point::new(self.max.x + amount, self.max.y + amount),
         }
     }
-
-    pub(in crate::presentation) fn normalized_point(self, point: Point) -> Point {
-        Point::new(
-            ((point.x - self.min.x) / self.width()).clamp(0.0, 1.0),
-            ((point.y - self.min.y) / self.height()).clamp(0.0, 1.0),
-        )
-    }
-
-    pub(in crate::presentation) fn point_from_normalized(self, point: Point) -> Point {
-        Point::new(
-            self.min.x + self.width() * point.x,
-            self.min.y + self.height() * point.y,
-        )
-    }
 }

@@ -8,7 +8,9 @@ state. Curated simulations select bounded effects; Phys;Sandbox may combine
 compatible physical effects but must preserve numeric safety.
 
 The product subdomains are Mechanics, Thermodynamics, Waves & Optics,
-Electromagnetism, Relativity, Fluid Dynamics, and Sandbox. Mechanics is the
-active vertical slice; the others stay separate until they have specifications.
+Electromagnetism, Relativity, Fluid Dynamics, and Sandbox. The active milestone
+implements independent minimum slices for the first four. They stay separate;
+future Phys;Sandbox bridge rules require their own specification and must not
+be created through direct subdomain imports.
 
 Renderer particle, vector, field, and mesh types are forbidden here.

@@ -1,58 +1,90 @@
 # Sim;X Documentation
 
 This directory is the canonical home of project-level design, architecture,
-product, and integration documentation. README files inside `src/` describe
-the responsibility of their local module; they do not override these project
+domain contracts, integration records, and external reviews. Local README files
+inside `src/` describe source-module ownership and do not override these
 contracts.
+
+## Start Here
+
+1. [`READ_FIRST_SIM_X_BOUNDARIES_AND_CODE_STYLE.md`](READ_FIRST_SIM_X_BOUNDARIES_AND_CODE_STYLE.md)
+   - mandatory repository boundaries and code style.
+2. The focused contract under [`domains/`](domains/) for the domain being
+   changed.
+3. [`architecture/COMPOSITION.md`](architecture/COMPOSITION.md) for Mechanics
+   entities, capabilities, relationships, interactions, or saved compositions.
+4. [`architecture/Structure.md`](architecture/Structure.md) for ownership and
+   dependency direction.
+5. [`product/ROADMAP.md`](product/ROADMAP.md) for authorized implementation
+   order.
+6. [`product/Implementation.md`](product/Implementation.md) for the
+   specification-first procedure.
+
+For user-authored content, rule packs, or executable extension proposals, also
+read [`architecture/EXTENSIBILITY.md`](architecture/EXTENSIBILITY.md).
 
 ## Current Scope
 
-Only the following vertical slice is authorized for implementation:
+The accepted prototype contains coherent minimum slices for four of the seven
+visible Sim;Phys subdomains: Mechanics, Thermodynamics, Waves and Optics, and
+Electromagnetism. This is not a claim that half of scientific Physics is
+modeled. Relativity, Fluid Dynamics, Phys;Sandbox, other top-level domains, and
+universal cross-domain composition remain outside the completed milestone.
 
-```text
-Sim;Phys
-└── Phys;Mechanics
-```
+## Directory Map
 
-The documents may record future ideas, but an idea is not an implementation
-commitment. Sim;Math, Sim;Chem, Sim;Biol, other Physics subdomains, and a
-cross-domain composition framework remain outside the active slice unless the
-roadmap explicitly promotes them.
+### Architecture
 
-## Mandatory Reading Order
+- [`architecture/COMPOSITION.md`](architecture/COMPOSITION.md) - normative
+  Mechanics composition model.
+- [`architecture/EXTENSIBILITY.md`](architecture/EXTENSIBILITY.md) - Custom
+  Objects and first-party Rust rule-pack policy.
+- [`architecture/Structure.md`](architecture/Structure.md) - module ownership,
+  dependency map, and repository structure.
 
-1. [`READ_FIRST_SIM_X_BOUNDARIES_AND_CODE_STYLE.md`](READ_FIRST_SIM_X_BOUNDARIES_AND_CODE_STYLE.md)
-   — repository-wide boundaries and code style.
-2. [`COMPOSITION.md`](COMPOSITION.md)
-   — normative entity, capability, relationship, interaction, determinism,
-   and saved-composition contract for Phys;Mechanics.
-3. [`Structure.md`](Structure.md)
-   — module ownership and dependency direction.
-4. [`ROADMAP.md`](ROADMAP.md)
-   — authorized order of implementation.
-5. [`Implementation.md`](Implementation.md)
-   — specification-first implementation procedure.
+### Product
 
-For any work involving user-authored content, new rule packs, or executable
-extensions, also read [`EXTENSIBILITY.md`](EXTENSIBILITY.md).
+- [`product/Brainstorm.md`](product/Brainstorm.md) - accepted product decisions
+  and unresolved questions.
+- [`product/UI.md`](product/UI.md) - Physics-specific Editor and View direction.
+- [`product/ROADMAP.md`](product/ROADMAP.md) - staged implementation plan.
+- [`product/Implementation.md`](product/Implementation.md) - implementation
+  rules and specification template.
+- [`product/DISTRIBUTION_AND_MONETIZATION.md`](product/DISTRIBUTION_AND_MONETIZATION.md)
+  - public source, Demo/Full, itch.io, support, licensing, and asset-rights
+  direction.
+- [`product/Ideas.md`](product/Ideas.md) - non-normative idea inventory.
 
-## Product Documents
+### Domain Contracts
 
-- [`Brainstorm.md`](Brainstorm.md) — accepted product decisions and unresolved
-  product questions.
-- [`UI.md`](UI.md) — Physics-only editor and View-mode direction.
-- [`Ideas.md`](Ideas.md) — broad concept and idea inventory; not normative.
+Sim;Phys contracts live together under [`domains/phys/`](domains/phys/):
 
-## Architecture Policies
+- [`MECHANICS_FMA.md`](domains/phys/MECHANICS_FMA.md);
+- [`PHYSICS_EDITOR_COMMANDS.md`](domains/phys/PHYSICS_EDITOR_COMMANDS.md);
+- [`THERMODYNAMICS_CONDUCTION.md`](domains/phys/THERMODYNAMICS_CONDUCTION.md);
+- [`WAVES_1D.md`](domains/phys/WAVES_1D.md);
+- [`ELECTROSTATICS.md`](domains/phys/ELECTROSTATICS.md).
 
-- [`EXTENSIBILITY.md`](EXTENSIBILITY.md) — accepted policy replacing the old
-  Lua plugin direction with Custom Objects and first-party Rust rule packs.
+### Sim;Engine Integration
 
-## Technical Reference
+- [`DOCUMENTATION.md`](integrations/sim_engine/DOCUMENTATION.md) - exact local
+  Sim;Engine 0.2.0 reference.
+- [`SIM_ENGINE_RENDERING_GAPS.md`](integrations/sim_engine/SIM_ENGINE_RENDERING_GAPS.md)
+  - renderer-only historical gaps and current integration ledger.
+- [`SIM_ENGINE_WISHLIST.md`](integrations/sim_engine/SIM_ENGINE_WISHLIST.md) -
+  proposed renderer roadmap and acceptance gates.
 
-- [`DOCUMENTATION.md`](DOCUMENTATION.md) — local Sim;Engine v0.1.0 integration
-  and API reference. The online crate documentation can differ from this
-  local copy, so integration work must compare both when relevant.
+### External Reviews
+
+- [`RED_TEAM_GATE_0_2.md`](reviews/RED_TEAM_GATE_0_2.md) - original Mechanics
+  Gates 0-2 review and remediation packet.
+- [`RED_TEAM_PHYS_4_OF_7.md`](reviews/RED_TEAM_PHYS_4_OF_7.md) - round 1
+  rejection, remediation ledger, and final accepted four-subdomain verdict.
+
+### Historical Reference
+
+- [`reference/ui_demo_sim_engine_0_1.txt`](reference/ui_demo_sim_engine_0_1.txt)
+  - archived non-compiling Sim;Engine 0.1 UI example.
 
 ## Authority of Documents
 
@@ -60,7 +92,7 @@ When documents disagree, use this priority:
 
 1. the currently approved user decision;
 2. the mandatory boundary document;
-3. the relevant normative domain contract such as `COMPOSITION.md`;
+3. the relevant normative domain contract;
 4. architecture and roadmap;
 5. product brainstorm and UI direction;
 6. non-normative ideas and examples.

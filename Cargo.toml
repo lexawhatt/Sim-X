@@ -3,10 +3,32 @@ name = "Sim-X"
 version = "0.1.0"
 edition = "2024"
 rust-version = "1.90"
+publish = false
+
+[lib]
+name = "sim_x"
+path = "src/lib.rs"
+
+[features]
+default = ["desktop"]
+desktop = [
+    "dep:env_logger",
+    "dep:pollster",
+    "dep:resvg",
+    "dep:rodio",
+    "dep:sim-engine",
+    "dep:winit",
+]
 
 [dependencies]
-env_logger = "0.11.11"
-pollster = "1.0.1"
-rodio = "0.22.2"
-sim-engine = "0.1.0"
-winit = "0.30.12"
+env_logger = { version = "0.11.11", optional = true }
+pollster = { version = "1.0.1", optional = true }
+resvg = { version = "0.48.1", default-features = false, optional = true }
+rodio = { version = "0.22.2", optional = true }
+sim-engine = { version = "=0.2.0", optional = true }
+winit = { version = "0.30.12", optional = true }
+
+[[bin]]
+name = "Sim-X"
+path = "src/main.rs"
+required-features = ["desktop"]

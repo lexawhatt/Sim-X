@@ -1,10 +1,10 @@
 # Read First: Sim;X Boundaries and Code Style
 
 This file is mandatory context before writing or changing Sim;X code. It is the
-short operational contract for the repository. `Structure.md` explains the
+short operational contract for the repository. `architecture/Structure.md` explains the
 same architecture in more detail. Any work on Phys;Mechanics entities, forces,
 constraints, interaction rules, events, persistence, or simulation stepping
-must also follow `COMPOSITION.md`.
+must also follow `architecture/COMPOSITION.md`.
 
 ## Product Boundary
 
@@ -38,16 +38,22 @@ other subsystem.
 
 ## Sim;Engine Boundary
 
-Sim;X integrates `sim-engine` 0.1.x as a visualization library. The published
-0.1.0 contract is pre-1.0, requires Rust 1.90, enables `wgpu` by default, and
-release-gates Linux with Vulkan.
+Sim;X integrates the published `sim-engine` 0.2.0 crate as a visualization
+library. The exact audited release is git commit
+`906e4464904bbdd871b8cdd151490443f2254e9d`, crates.io checksum
+`0e0867c3ef3e22880d79d0f5bfbdc2179b3e671f7c835a0c1edb220a2931cdea`.
+It requires Rust 1.90, enables `wgpu` by default, and release-gates Linux with
+Vulkan.
 
 Sim;Engine owns:
 
-- cameras, projections, picking conversions, clipping, and visual tweening;
-- validated 2D scenes and visual styles;
-- prepared scenes, dynamic visual meshes, particle fields, and scalar fields;
-- render targets, composition, trails, diagnostics, and GPU recovery;
+- cameras, projections, typed world/screen viewports, clipping, and visual
+  tweening;
+- explicitly budgeted world `Scene` and fixed-coordinate `ScreenScene` data;
+- prepared scenes, dynamic visual meshes, particle/scalar fields, retained
+  images, glyph atlases/runs, and rich strokes;
+- single-present frame composition, render targets, trails, diagnostics, and
+  GPU recovery;
 - retained stereometry meshes, transforms, depth, and display edges.
 
 Sim;Engine does not own:
@@ -73,7 +79,10 @@ The adapter must preserve these distinctions:
 - `ParticleInstance2d` is a visual instance, not a Sim;phys particle;
 - `ScalarField` is a visual upload snapshot, not canonical domain storage;
 - `Tween` changes presentation only and never advances simulation state;
-- renderer recovery rebuilds visual resources without resetting domain state.
+- renderer recovery rebuilds visual resources without resetting domain state;
+- one redraw uses one bounded `FrameComposer`; fixed chrome uses
+  `ScreenScene`, while scientific world geometry uses its own camera and
+  viewport.
 
 A normal frame flows in one direction:
 
@@ -109,7 +118,7 @@ Additional rules:
    formulas or mutate domain state directly.
 5. Custom Objects are validated saved compositions, not executable plugins.
    New official scientific behavior is added as first-party Rust rule packs
-   compiled with Sim;X and governed by `EXTENSIBILITY.md`.
+   compiled with Sim;X and governed by `architecture/EXTENSIBILITY.md`.
 6. There is no active external executable extension runtime or public native
    Rust plugin ABI. Do not prepare domain APIs for Lua, WASM, or dynamic Rust
    plugins without an approved concrete use case and specification.

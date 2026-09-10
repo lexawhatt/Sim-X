@@ -1,7 +1,6 @@
-mod app;
-mod presentation;
+//! Native desktop entry point for Sim;X.
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    app::run().map_err(std::io::Error::other)?;
+    sim_x::app::run().map_err(std::io::Error::other)?;
     Ok(())
 }

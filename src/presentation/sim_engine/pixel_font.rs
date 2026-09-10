@@ -1,13 +1,15 @@
-use ::sim_engine::{Color, Rect as EngineRect, Scene, ShapeStyle, Vec2};
+use ::sim_engine::{Color, ShapeStyle};
 
 use crate::presentation::ui::{
     geometry::{Point, UiRect},
     layout::UiLayout,
 };
 
+use super::scene_builder::UiSceneBuilder as Scene;
+
 pub(super) fn draw(
     scene: &mut Scene,
-    layout: UiLayout,
+    _layout: UiLayout,
     text: &str,
     origin: Point,
     pixel_size: f32,
@@ -28,11 +30,7 @@ pub(super) fn draw(
                         (pixel_size - 0.55).max(0.5),
                         (pixel_size - 0.55).max(0.5),
                     );
-                    scene.rect(
-                        screen_rect_to_world(layout, pixel),
-                        0.0,
-                        ShapeStyle::filled(color),
-                    );
+                    scene.rect(ui_rect(pixel), 0.0, ShapeStyle::filled(color));
                 }
             }
         }
@@ -68,16 +66,8 @@ fn text_width(text: &str, pixel_size: f32) -> f32 {
     columns as f32 * pixel_size
 }
 
-fn screen_rect_to_world(layout: UiLayout, rect: UiRect) -> EngineRect {
-    EngineRect::new(
-        screen_to_world(layout, rect.max),
-        screen_to_world(layout, rect.min),
-    )
-    .normalized()
-}
-
-fn screen_to_world(layout: UiLayout, point: Point) -> Vec2 {
-    Vec2::new(point.x - layout.width * 0.5, layout.height * 0.5 - point.y)
+fn ui_rect(rect: UiRect) -> UiRect {
+    rect
 }
 
 fn glyph_pattern(character: char) -> [u8; 5] {

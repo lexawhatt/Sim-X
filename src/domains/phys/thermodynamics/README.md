@@ -1,10 +1,11 @@
 # Sim;phys;Thermodynamics
 
-This future subdomain will own ideal-gas, diffusion, and Brownian-motion state
-and rules after the Phys;Mechanics vertical slice and its own specifications
-are complete.
+This subdomain owns temperature, thermal energy, heat capacity, conductive
+relationships, and thermodynamic read models. Its first slice is the bounded
+lumped-capacitance conduction model specified in
+`docs/domains/phys/THERMODYNAMICS_CONDUCTION.md`.
 
-It may use public Sim;phys foundation contracts. It must not depend directly
-on Mechanics, Gravity, Relativity, presentation, or a concrete renderer. An
-external physical effect interacts through declared capabilities such as mass,
-position, and accumulated force.
+It may use domain-neutral foundation contracts. It must not depend directly on
+Mechanics, another Physics subdomain, presentation, or a concrete renderer.
+Ideal gases, diffusion, phase transitions, and Brownian motion remain separate
+future contracts rather than hidden additions to the conduction model.
