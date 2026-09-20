@@ -1,0 +1,15 @@
+[package]
+name = "sim-physics"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.95"
+license = "MIT OR Apache-2.0"
+description = "Renderer-independent, bounded physical composition kernel for Sim;X"
+
+[lints.rust]
+unsafe_code = "forbid"
+missing_docs = "deny"
+
+[lints.clippy]
+all = "warn"
+

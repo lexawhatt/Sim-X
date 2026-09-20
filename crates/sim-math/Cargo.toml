@@ -1,0 +1,12 @@
+[package]
+name = "sim-math"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.95"
+publish = false
+description = "Renderer-independent mathematics for Sim;X"
+
+[dependencies]
+meval = "=0.2.0"
+gauss-quad = { version = "=0.3.2", default-features = false, features = ["std"] }
+statrs = { version = "=0.18.0", default-features = false }

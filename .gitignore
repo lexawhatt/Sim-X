@@ -1,2 +1,9 @@
 /target
-/docs
+/workflow/
+
+# Private Math planning references; remove after the Math milestone.
+/test1.pdf
+/test2.pdf
+/test3.pdf
+/test4.pdf
+/tmp/pdfs/

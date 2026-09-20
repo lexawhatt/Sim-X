@@ -1,14 +1,23 @@
-//! Sim;X application and scientific domain library.
+//! The new Sim;X application shell, hosted by Sim;Logic.
 //!
-//! The current scientific milestone contains four independent `Sim;Phys`
-//! slices: translational Mechanics, lumped-conduction Thermodynamics, a 1D
-//! wave field, and stationary electrostatic field evaluation. Presentation and
-//! desktop lifecycle remain optional so every scientific core runs headlessly.
+//! Includes the main menu, domain/scale pickers and named session projects in
+//! a Physics editor with a separately owned, renderer-independent mechanics run.
+//! The physical model includes 2D bodies, rods, attached springs and gravity.
+//! Math has its own structured expression editor and renderer-independent core.
 
+#![warn(missing_docs)]
+
+mod actions;
+mod app;
+mod math_editor;
+mod menu;
+mod navigation;
+mod phys_editor;
 #[cfg(feature = "desktop")]
-/// Desktop application composition and startup boundary.
-pub mod app;
-pub mod domains;
-pub mod foundation;
-#[cfg(feature = "desktop")]
-pub(crate) mod presentation;
+pub mod platform;
+
+pub use app::build_application;
+pub use math_editor::build_math_editor_application;
+pub use menu::input::MenuAction;
+pub use phys_editor::build_phys_editor_application;
+pub use phys_editor::input::EditorAction;

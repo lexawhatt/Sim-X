@@ -1,9 +1,15 @@
 [package]
 name = "Sim-X"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2024"
-rust-version = "1.90"
+rust-version = "1.95"
 publish = false
+description = "Sim;X scientific playground - independent Physics and Math workspaces"
+
+[workspace]
+members = ["crates/sim-physics", "crates/sim-math"]
+default-members = [".", "crates/sim-physics", "crates/sim-math"]
+resolver = "3"
 
 [lib]
 name = "sim_x"
@@ -11,24 +17,34 @@ path = "src/lib.rs"
 
 [features]
 default = ["desktop"]
-desktop = [
-    "dep:env_logger",
-    "dep:pollster",
-    "dep:resvg",
-    "dep:rodio",
-    "dep:sim-engine",
-    "dep:winit",
-]
+desktop = ["sim-logic/desktop", "sim-logic/text", "dep:arboard"]
 
 [dependencies]
-env_logger = { version = "0.11.11", optional = true }
-pollster = { version = "1.0.1", optional = true }
-resvg = { version = "0.48.1", default-features = false, optional = true }
-rodio = { version = "0.22.2", optional = true }
-sim-engine = { version = "=0.2.0", optional = true }
-winit = { version = "0.30.12", optional = true }
+sim-logic = { path = "../Sim-Logic", default-features = false, features = ["headless-text"] }
+resvg = { version = "=0.48.1", default-features = false }
+sim-physics = { path = "crates/sim-physics" }
+sim-math = { path = "crates/sim-math" }
+meval = "=0.2.0"
+arboard = { version = "=3.6.1", default-features = false, features = ["wayland-data-control"], optional = true }
 
 [[bin]]
 name = "Sim-X"
 path = "src/main.rs"
 required-features = ["desktop"]
+
+[[example]]
+name = "menu_probe"
+required-features = ["desktop"]
+
+[profile.dev]
+debug = "line-tables-only"
+incremental = false
+opt-level = 1
+
+# Native tessellation/portable geometry proofs run every animated frame. Keep
+# those hot paths optimized even when the application is launched with cargo run.
+[profile.dev.package.sim-engine]
+opt-level = 3
+
+[profile.dev.package.sim-logic]
+opt-level = 2

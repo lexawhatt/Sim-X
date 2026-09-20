@@ -7,32 +7,58 @@ on:
 jobs:
   rust:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: Sim-X
     steps:
       - uses: actions/checkout@v4
-      - name: Install desktop build dependencies
-        run: sudo apt-get update && sudo apt-get install --yes libasound2-dev
+        with:
+          path: Sim-X
+      - name: Check out the audited Sim;Logic baseline
+        uses: actions/checkout@v4
+        with:
+          repository: lexawhatt/Sim-Logic
+          ref: b48191159c188d6e12e997d153ccd17cbdd40ab9
+          path: Sim-Logic
       - uses: dtolnay/rust-toolchain@stable
         with:
           components: clippy,rustfmt
       - uses: Swatinem/rust-cache@v2
-      - name: Install module graph checker
-        run: cargo install cargo-modules --version 0.27.0 --locked
+        with:
+          workspaces: Sim-X
       - name: Format
         run: cargo fmt --all -- --check
       - name: Headless tests
-        run: cargo test --lib --no-default-features
-      - name: Complete tests
-        run: cargo test --all-targets --all-features
-      - name: Headless Clippy
-        run: cargo clippy --lib --no-default-features -- -D warnings
-      - name: Complete Clippy
-        run: cargo clippy --all-targets --all-features -- -D warnings
-      - name: Documentation
-        run: RUSTDOCFLAGS="-D warnings -D missing-docs" cargo doc --no-deps --all-features
-      - name: Architecture dependency graph
-        run: bash tools/check_module_boundaries.sh
-      - uses: dtolnay/rust-toolchain@1.90.0
-      - name: Declared Rust 1.90 compatibility
+        run: cargo test --locked --workspace --all-targets --no-default-features
+      - name: Independent Physics crate and dependency boundary
         run: |
-          cargo check --all-targets --no-default-features
-          cargo check --all-targets --all-features
+          cargo test --locked -p sim-physics --all-targets
+          cargo tree --locked -p sim-physics
+          cargo metadata --locked --no-deps --format-version 1 | python3 -c 'import json,sys; p=next(p for p in json.load(sys.stdin)["packages"] if p["name"] == "sim-physics"); assert not p["dependencies"], "Physics must remain std-only; review any new dependency explicitly"'
+      - name: Headless dependency boundary
+        run: |
+          cargo tree --locked --no-default-features --prefix none --format '{p}' > headless-dependencies.txt
+          if rg '^(wgpu|wgpu-core|wgpu-hal|winit|naga|ash) v' headless-dependencies.txt; then
+            exit 1
+          fi
+      - name: Independent Math dependency boundary
+        run: |
+          cargo test --locked -p sim-math --all-targets
+          cargo metadata --locked --no-deps --format-version 1 | python3 -c 'import json,sys; p=next(p for p in json.load(sys.stdin)["packages"] if p["name"] == "sim-math"); assert {d["name"] for d in p["dependencies"]} == {"meval", "gauss-quad", "statrs"}, "Review mathematical dependencies explicitly; no application or rendering dependency"'
+          cargo tree --locked -p sim-math --prefix none --format '{p}' > math-dependencies.txt
+          if rg '^(Sim-X|sim-physics|sim-logic|sim-engine|wgpu|winit|bevy_ecs) v' math-dependencies.txt; then
+            exit 1
+          fi
+      - name: Complete tests
+        run: cargo test --locked --workspace --all-targets --all-features
+      - name: Headless Clippy
+        run: cargo clippy --locked --workspace --all-targets --no-default-features -- -D warnings
+      - name: Complete Clippy
+        run: cargo clippy --locked --workspace --all-targets --all-features -- -D warnings
+      - name: Documentation
+        run: RUSTDOCFLAGS="-D warnings -D missing-docs" cargo doc --locked --workspace --no-deps --all-features
+      - uses: dtolnay/rust-toolchain@1.95.0
+      - name: Declared Rust 1.95 compatibility
+        run: |
+          cargo check --locked --workspace --all-targets --no-default-features
+          cargo check --locked --workspace --all-targets --all-features

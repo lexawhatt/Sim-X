@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 768 768" width="768" height="768">
+  <!-- Immutable orbit artwork. Electrons and the nucleus are animated by Sim;X. -->
+  <g fill="none" stroke="#8bddbd">
+    <g stroke-width="0.85" opacity="0.065">
+      <circle cx="384" cy="384" r="311.04"/>
+      <circle cx="384" cy="384" r="238.08"/>
+      <circle cx="384" cy="384" r="30.72"/>
+      <path d="M26.88 384H741.12M384 26.88V741.12"/>
+    </g>
+    <g stroke-width="1.35" opacity="0.42">
+      <ellipse cx="384" cy="384" rx="125.952" ry="311.04"/>
+      <ellipse cx="384" cy="384" rx="125.952" ry="311.04" transform="rotate(60 384 384)"/>
+      <ellipse cx="384" cy="384" rx="125.952" ry="311.04" transform="rotate(120 384 384)"/>
+    </g>
+  </g>
+</svg>
