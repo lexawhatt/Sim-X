@@ -180,7 +180,10 @@ width, opacity, or solid/dashed/dotted lines. Appearance does not change math.
   to position the caret. Shift+arrows or mouse drag select formula parts; crossing
   a template boundary selects the enclosing structure. Ctrl+A selects a row.
   Ctrl+C/X/V use the system clipboard; Ctrl+Z/Y undo/redo. External paste accepts
-  one plain-math expression at a time (not LaTeX), rejecting unsupported text.
+  plain math (not LaTeX). One expression is inserted at the caret; multiple
+  nonblank lines become separate rows in one undoable operation. A batch uses
+  an empty/fully selected row or inserts after the current expression. Invalid
+  input reports its line without making a partial insertion.
   Removing an integral at its boundary preserves the integrand; inserting an
   integral wraps the selection or the expression to the right of the caret.
 - Click empty sidebar space to start another expression. Enter inserts after

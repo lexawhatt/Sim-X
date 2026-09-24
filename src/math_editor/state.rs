@@ -1,8 +1,12 @@
-use super::{
-    formula::Formula,
-    formula_layout::FormulaLayout,
-    layout::{Camera, Layout, Target},
-    worker::{Plot, Request, Worker},
+use crate::math_editor::{
+    compute::{Plot, Request, Worker},
+    formula::{self, Formula, layout::FormulaLayout},
+    interaction::{clipboard, editing, parameters},
+    scene::{self, style},
+    view::{
+        layout::{Camera, Layout, Target},
+        motion,
+    },
 };
 use sim_logic::prelude::*;
 use sim_math::geometry::{Construction, Geometry, Point, PointId, Shape};
@@ -11,16 +15,16 @@ use sim_math::geometry::{Construction, Geometry, Point, PointId, Shape};
 pub(super) struct Document {
     pub(super) fields: Vec<Formula>,
     pub(super) visible: Vec<bool>,
-    pub(super) styles: Vec<super::graph_style::GraphStyle>,
+    pub(super) styles: Vec<style::GraphStyle>,
     pub(super) geometry: Geometry,
-    pub(super) parameter_ranges: std::collections::BTreeMap<char, super::parameters::Range>,
+    pub(super) parameter_ranges: std::collections::BTreeMap<char, parameters::Range>,
 }
 impl Default for Document {
     fn default() -> Self {
         Self {
             fields: vec![Formula::default()],
             visible: vec![true],
-            styles: vec![super::graph_style::GraphStyle::new(0)],
+            styles: vec![style::GraphStyle::new(0)],
             geometry: Geometry::default(),
             parameter_ranges: Default::default(),
         }
@@ -37,20 +41,20 @@ pub(crate) struct MathState {
     pub(super) undo: Vec<Document>,
     pub(super) redo: Vec<Document>,
     pub(super) focus: Option<usize>,
-    pub(super) editing: super::editing::EditingSession,
+    pub(super) editing: editing::EditingSession,
     pub(super) layouts: Vec<FormulaLayout>,
     pub(super) layout_dirty: Vec<bool>,
     pub(super) offsets: Vec<[f32; 2]>,
-    pub(super) formula_drag: Option<(usize, super::formula::Caret, [f32; 2])>,
-    pub(super) parameters: Vec<Option<super::parameters::Parameter>>,
+    pub(super) formula_drag: Option<(usize, formula::Caret, [f32; 2])>,
+    pub(super) parameters: Vec<Option<parameters::Parameter>>,
     pub(super) missing_parameters: Vec<Vec<char>>,
     pub(super) parameter_drag: Option<(usize, Document)>,
-    pub(super) playback: Option<super::parameters::Playback>,
+    pub(super) playback: Option<parameters::Playback>,
     pub(super) range_edit: Option<(usize, bool, String)>,
     pub(super) sidebar_scroll: f32,
     pub(super) keypad: bool,
     pub(super) alphabet: bool,
-    pub(crate) clipboard_pending: Option<super::clipboard::ClipboardRequest>,
+    pub(crate) clipboard_pending: Option<clipboard::ClipboardRequest>,
     pub(super) clipboard_local: Option<(String, Formula)>,
     pub(super) notice: Option<String>,
     pub(super) functions: bool,
@@ -60,7 +64,7 @@ pub(crate) struct MathState {
     pub(super) suppress_release: bool,
     pub(super) camera: Camera,
     pub(super) camera_target: Option<Camera>,
-    pub(super) spatial: super::spatial::Spatial,
+    pub(super) spatial: scene::Spatial,
     pub(super) worker: Worker,
     pub(super) plot: Option<Plot>,
     pub(super) stale: bool,
@@ -76,7 +80,7 @@ pub(crate) struct MathState {
     pub(super) viewport: Option<LogicalViewport>,
     pub(super) hovered: Option<Target>,
     pub(super) blink: f32,
-    pub(super) motion: super::motion::Motion,
+    pub(super) motion: motion::Motion,
     pub(super) tool: usize,
     pub(super) link: Option<PointId>,
     pub(super) drag: Option<Drag>,

@@ -1,9 +1,8 @@
 //! Explicit user-requested system clipboard IO, isolated from the UI frame and
 //! scientific state. Keep the backend alive for X11/Wayland clipboard ownership.
-use crate::{
-    actions::AppAction,
-    math_editor::{clipboard::ClipboardAction, state::MathState},
-};
+use crate::actions::AppAction;
+use crate::math_editor::interaction::clipboard::ClipboardAction;
+use crate::math_editor::state::MathState;
 use sim_logic::prelude::*;
 use std::sync::{
     Mutex,

@@ -1,5 +1,9 @@
 //! Independent Math world installed into the same Sim;Logic application host.
-use super::{assets::Fonts, input, state::MathState, view};
+use crate::math_editor::{
+    interaction,
+    state::MathState,
+    view::{self, assets::Fonts},
+};
 use crate::{actions::AppAction, menu::state::MenuState};
 use sim_logic::prelude::*;
 
@@ -31,7 +35,7 @@ pub(crate) fn install(
         app.bind_key(key, AppAction::CatalogInput)?;
     }
     app.add_fallible_frame_system(navigate);
-    app.add_fallible_frame_system(input::route);
+    app.add_fallible_frame_system(interaction::route);
     app.add_fallible_frame_system(view::refresh);
     Ok(app.register_world("math-editor", move |world| {
         world

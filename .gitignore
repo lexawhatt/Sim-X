@@ -1,5 +1,6 @@
 /target
 /workflow/
+/.idea/
 
 # Private Math planning references; remove after the Math milestone.
 /test1.pdf

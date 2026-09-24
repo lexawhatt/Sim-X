@@ -3,54 +3,48 @@
 This module is a native Sim;Logic consumer. It never imports Physics or a direct
 GPU/Engine host. Math is a live mathematical document, not Physics Editor/Run.
 
-- `app`: world lifecycle, input registration, font resource reuse, navigation.
-- `state` / `commands`: equal-status rows, history, operation activation,
-  appearance and geometric authoring gestures.
-- `formula`: arena-backed editable notation and caret/slot traversal. Fractions,
-  powers, radicals, absolute values, integral limits/body and derivatives are
-  structures, not a pretty overlay over an unrelated plain-text input.
-- `formula_layout`: iterative layout and the same caret positions for picking.
-  Dynamic row height plus scrolling keeps deep expressions editable.
-  Serialization and layout share the formula's implicit-product classifier;
-  a visible dot has width, but is not a fake editable atom.
-- `formula_selection` / `formula_import`: structural selections and atomic
-  plain-math import using meval's tokenizer/RPN parser, preserving numeric spelling.
-- `clipboard` / `platform/clipboard`: explicit intents and asynchronous native
-  IO. Native ownership stays alive in the executable, never in headless builders.
-- `parameters` / `motion`: literal-definition sliders, editable ranges and one
-  undo transaction per drag/play session; separate decorative easing.
-- `camera_motion` / `spatial` / `spatial_view`: eased zoom/reset and 2D/3D
-  transition, orbit ownership, Logic Camera3d projection and open-axis wireframe.
-  Camera motion never morphs mathematical answers; surface sampling is off-thread.
-- `spatial_clip` / `wireframe_view`: invisible, view-scaled world bounds and
-  near/far segment clipping before projection, followed by depth-faded isolines.
-  Samples outside the volume are not clamped into artificial boundary faces.
-- `worker_spatial` / `surface_paths`: cancellable implicit XYZ boundary sampling
-  and endpoint stitching/deduplication on the worker, not the frame thread.
-- `row_interpretation`: explicit, fading XY-curve hints for ordinary rows in 3D.
-- `axis_ticks` / `axis_view` / `axis_spatial`: zero-anchored 1/2/5 major/minor
-  grids, font-width-aware collision avoidance and projected XYZ numeric ticks.
-  Density follows screen spacing even for foreshortened 3D grids.
-- `layout` / `input`: shared logical-pixel hit regions, sidebar/catalog scrolling,
-  keyboard entry, graph pan/zoom, click vs hold, focus and modal ownership.
-- `row_flow` / `editing` / `entry_hint`: click-to-write draft rows, cross-row
-  focus, local held-key cadence, contiguous-symbol undo groups and slot hints.
-- `point_labels`: screen-space placement prefers clear space, with a small
-  background for dense cases. This is heuristic layout, not a guarantee that
-  arbitrarily crowded labels all fit.
-- `worker`: one latest-request mailbox; scalar dependency resolution, sampling,
-  contour jobs and round-robin resumable integration. Cancellation invalidates
-  obsolete publication; each row owns its result and diagnostic.
-- `worker_calculus`: resumable result adapter and one-request scalar cache.
-  Camera-only resampling preserves completed calculations; source edits clear
-  the cache, and activation changes invalidate only the affected row.
-- `integral_plot` / `integral_view` / `integral_motion`: worker-sampled boundary
-  curves and signed bands, 2D-only fill plus projected-XY curves, and per-row reveal
-  after successful calculation. Exact bounds are included even below pixel size.
-- `graph_style`, `curve_display`, `contour_display`: appearance, subpixel display
-  simplification and contour stitching. They do not modify mathematical samples.
-- `view`, `sidebar_view`, `graph_view`, `drawing`, `assets`: retained native
-  presentation and bundled font metrics, not scientific state.
+## Source map
+
+The editor is organized by responsibility, not one flat file per small helper:
+
+```text
+math_editor/
+|-- app.rs          # World lifecycle, font reuse and navigation
+|-- state.rs        # Document, history and transient editor state
+|-- formula/        # Editable arena, selection, import, layout and caret geometry
+|-- interaction/    # Input, commands, row lifecycle, clipboard and parameters
+|-- compute/        # Latest-request worker, integral plots and surface stitching
+|-- scene/          # Camera, axes, clipping and 2D/3D mathematical presentation
+|-- view/           # UI layout, sidebar, keyboard, fonts and retained visuals
+`-- tests/          # Headless interaction and rendering regressions
+```
+
+The public application builder is unchanged. Formula and input white-box tests
+stay beside the corresponding implementation; the other editor tests live in
+`tests/`. Modules use ordinary Rust paths, without a flat compatibility facade
+or custom path attributes. Private implementation APIs remain scoped to Math.
+
+- `formula/` owns structured editing, not an invisible plain-text buffer.
+  Iterative layout shares caret geometry with picking. Serialization and layout
+  use one implicit-product classifier; visible product dots are not fake atoms.
+- `interaction/rows.rs` owns insertion/removal and the aligned per-row metadata.
+  Clipboard batches and parameter creation use that same insertion primitive.
+  Editing cadence, structural selection and native IO requests stay separate.
+- `compute/` owns cancellable mathematical work off the frame thread.
+  Its scalar cache survives camera-only resampling, never source changes.
+  Integral boundaries and surface paths are sampled/stitched here, not in view.
+- `scene/` owns the mathematical view: zero-anchored major/minor ticks,
+  collision-aware labels, open XYZ axes, orthographic orbit and invisible
+  world/camera clipping. Display simplification never changes scientific values.
+  Grid policy, projected axes and tick formatting are together in `axes.rs`;
+  curve simplification and contour stitching are together in `display.rs`.
+- `view/` owns UI composition and retained native visuals, not computation.
+  Row interpretation stays with the sidebar; point-label placement stays with
+  graph presentation. Hover and integral-reveal timing share `motion.rs`.
+  Camera easing stays beside camera state in `scene/mod.rs`.
+- `state.rs` coordinates one document and its operation activation/history.
+  `app.rs` installs it in Sim;Logic. The scientific library remains the separate
+  `crates/sim-math` crate; Physics is not a dependency of this editor.
 
 ## Input and result conventions
 
@@ -106,9 +100,16 @@ slot boundary selects its containing atom, never half a fraction's ownership.
 Ctrl+C/X/V use the OS clipboard. Copy without a selection copies the active row;
 cut removes it only after successful copying. Paste at the caret is one undoable
 operation. Cached internal transfers retain exact structure. External paste
-accepts one plain expression/equation, explicit integral(a,b,body), registered
-functions and implicit multiplication; it rejects LaTeX, unsupported characters
-and multiple rows without changing the document. Native service uses arboard
+accepts plain expressions/equations, explicit integral(a,b,body), registered
+functions and implicit multiplication. One nonblank line inserts at the caret.
+Multiple lines insert separate expression rows in one undo transaction: an empty
+or fully selected row is replaced; otherwise rows go after the focused expression
+without splitting a partial selection or nested formula slot. Blank lines and
+CRLF are accepted. All lines are parsed before any edit; invalid input reports
+its original line number without partial changes. New rows are not implicitly
+calculated, existing neighbors keep appearance/activation, and focus moves to the
+last inserted row. LaTeX and unsupported characters are still rejected.
+Native service uses arboard
 3.6.1, default features off, optional desktop-only Wayland data-control support.
 It retains clipboard ownership and never blocks the frame on a clipboard read.
 Late paste/cut results cannot change a different document revision or selection.
